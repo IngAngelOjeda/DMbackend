@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  dmBackend:
+    build: .
+    container_name: dmBackend
+    image: dmbackend-api:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    networks:
+      - infra_net
+    restart: always
+
+networks:
+  infra_net:
+    external: true

@@ -1,0 +1,18 @@
+filebeat.inputs:
+  - type: filestream
+    id: factupy-logs
+    enabled: true
+    paths:
+      - /var/log/app/application-info.log
+      - /var/log/app/application-error.log
+
+output.logstash:
+  hosts: ["logstash:5044"]
+
+# Opcional: agregar campos que ayudan en Kibana
+processors:
+  - add_fields:
+      target: ""
+      fields:
+        service: "factupy"
+        env: "dev"
