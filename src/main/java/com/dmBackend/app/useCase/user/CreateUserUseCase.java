@@ -1,4 +1,4 @@
-package com.dmBackend.app.useCase;
+package com.dmBackend.app.useCase.user;
 
 public interface CreateUserUseCase {
 }
