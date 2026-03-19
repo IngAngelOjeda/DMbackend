@@ -23,10 +23,10 @@ FROM eclipse-temurin:23-jre-jammy
 WORKDIR /app
 
 # Artefacto final desde la etapa anterior
-COPY --from=builder /app/target/factuPy-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=builder /app/target/dmBackend-0.0.1-SNAPSHOT.jar app.jar
 
 # Puerto
-EXPOSE 8080
+EXPOSE 8088
 
 # Perfil
 ENV SPRING_PROFILES_ACTIVE=dev
