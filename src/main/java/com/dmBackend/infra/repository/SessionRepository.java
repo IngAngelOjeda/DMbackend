@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+
+
 @Repository
 public interface SessionRepository extends JpaRepository<SessionEntity, Long> {
 
@@ -44,4 +46,45 @@ public interface SessionRepository extends JpaRepository<SessionEntity, Long> {
     boolean existsByVehicleIdAndStatus(Long vehicleId, SessionStatus status);
 
     boolean existsByDriverIdAndStatus(Long driverId, SessionStatus status);
+
+    @Query("SELECT s.status, COUNT(s) FROM SessionEntity s WHERE s.userId = :userId GROUP BY s.status")
+    List<Object[]> countByUserIdGroupByStatus(@Param("userId") String userId);
+
+    @Query("""
+            SELECT COALESCE(SUM(s.finalMileage - s.initialMileage), 0)
+            FROM SessionEntity s
+            WHERE s.userId = :userId AND s.status = com.dmBackend.domain.model.enums.SessionStatus.CLOSED
+            """)
+    Long sumKilometersByUserId(@Param("userId") String userId);
+
+    @Query("""
+            SELECT s.vehicle.id, s.vehicle.plate, s.vehicle.brand, s.vehicle.model,
+                   SUM(s.finalMileage - s.initialMileage)
+            FROM SessionEntity s
+            WHERE s.userId = :userId AND s.status = com.dmBackend.domain.model.enums.SessionStatus.CLOSED
+            GROUP BY s.vehicle.id, s.vehicle.plate, s.vehicle.brand, s.vehicle.model
+            ORDER BY SUM(s.finalMileage - s.initialMileage) DESC
+            """)
+    List<Object[]> findTopVehiclesByKilometers(@Param("userId") String userId, Pageable pageable);
+
+    @Query("""
+            SELECT s.driver.id, s.driver.firstName, s.driver.lastName,
+                   SUM(s.finalMileage - s.initialMileage)
+            FROM SessionEntity s
+            WHERE s.userId = :userId AND s.status = com.dmBackend.domain.model.enums.SessionStatus.CLOSED
+            GROUP BY s.driver.id, s.driver.firstName, s.driver.lastName
+            ORDER BY SUM(s.finalMileage - s.initialMileage) DESC
+            """)
+    List<Object[]> findTopDriversByKilometers(@Param("userId") String userId, Pageable pageable);
+
+    @Query("""
+            SELECT s.platform.id, s.platform.name, COUNT(s),
+                   COALESCE(SUM(CASE WHEN s.status = com.dmBackend.domain.model.enums.SessionStatus.CLOSED
+                                     THEN s.finalMileage - s.initialMileage ELSE 0 END), 0)
+            FROM SessionEntity s
+            WHERE s.userId = :userId
+            GROUP BY s.platform.id, s.platform.name
+            ORDER BY COUNT(s) DESC
+            """)
+    List<Object[]> findSessionsByPlatform(@Param("userId") String userId);
 }

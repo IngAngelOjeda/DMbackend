@@ -16,4 +16,6 @@ public interface DriverRepository extends JpaRepository<DriverEntity, Long> {
     Optional<DriverEntity> findByIdAndUserId(Long id, String userId);
 
     boolean existsByUserIdAndDocumentNumber(String userId, String documentNumber);
+
+    long countByUserId(String userId);
 }

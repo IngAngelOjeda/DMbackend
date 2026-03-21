@@ -18,4 +18,6 @@ public interface VehicleRepository extends JpaRepository<VehicleEntity, Long> {
     boolean existsByUserIdAndPlate(String userId, String plate);
 
     boolean existsByUserIdAndPlateAndIdNot(String userId, String plate, Long id);
+
+    long countByUserId(String userId);
 }
